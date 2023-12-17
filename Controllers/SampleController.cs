@@ -1,12 +1,16 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
-[ApiController]
-[Route("api/[controller]")]
-public class SampleController : ControllerBase
+namespace Thesis.courseWebApp.Backend.Controllers
 {
-    [HttpGet]
-    public ActionResult<string> Get()
+    [ApiController]
+    [Route("api/[controller]")]
+    public class SampleController : ControllerBase
     {
-        return "Hello from the backend!";
+        [HttpGet]
+        public ActionResult<string> Get()
+        {
+            return "Hello from the backend!";
+        }
     }
 }

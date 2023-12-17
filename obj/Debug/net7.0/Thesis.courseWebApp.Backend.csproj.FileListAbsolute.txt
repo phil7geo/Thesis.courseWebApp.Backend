@@ -5,6 +5,16 @@ C:\Users\fgeorgantzos\source\repos\phil7geo\Thesis.courseWebApp.Backend\bin\Debu
 C:\Users\fgeorgantzos\source\repos\phil7geo\Thesis.courseWebApp.Backend\bin\Debug\net7.0\Thesis.courseWebApp.Backend.runtimeconfig.json
 C:\Users\fgeorgantzos\source\repos\phil7geo\Thesis.courseWebApp.Backend\bin\Debug\net7.0\Thesis.courseWebApp.Backend.dll
 C:\Users\fgeorgantzos\source\repos\phil7geo\Thesis.courseWebApp.Backend\bin\Debug\net7.0\Thesis.courseWebApp.Backend.pdb
+C:\Users\fgeorgantzos\source\repos\phil7geo\Thesis.courseWebApp.Backend\bin\Debug\net7.0\HtmlAgilityPack.dll
+C:\Users\fgeorgantzos\source\repos\phil7geo\Thesis.courseWebApp.Backend\bin\Debug\net7.0\Microsoft.EntityFrameworkCore.dll
+C:\Users\fgeorgantzos\source\repos\phil7geo\Thesis.courseWebApp.Backend\bin\Debug\net7.0\Microsoft.EntityFrameworkCore.Abstractions.dll
+C:\Users\fgeorgantzos\source\repos\phil7geo\Thesis.courseWebApp.Backend\bin\Debug\net7.0\microsoft.identitymodel.dll
+C:\Users\fgeorgantzos\source\repos\phil7geo\Thesis.courseWebApp.Backend\bin\Debug\net7.0\Microsoft.IdentityModel.Abstractions.dll
+C:\Users\fgeorgantzos\source\repos\phil7geo\Thesis.courseWebApp.Backend\bin\Debug\net7.0\Microsoft.IdentityModel.JsonWebTokens.dll
+C:\Users\fgeorgantzos\source\repos\phil7geo\Thesis.courseWebApp.Backend\bin\Debug\net7.0\Microsoft.IdentityModel.Logging.dll
+C:\Users\fgeorgantzos\source\repos\phil7geo\Thesis.courseWebApp.Backend\bin\Debug\net7.0\Microsoft.IdentityModel.Tokens.dll
+C:\Users\fgeorgantzos\source\repos\phil7geo\Thesis.courseWebApp.Backend\bin\Debug\net7.0\System.IdentityModel.Tokens.Jwt.dll
+C:\Users\fgeorgantzos\source\repos\phil7geo\Thesis.courseWebApp.Backend\obj\Debug\net7.0\Thesis.courseWebApp.Backend.csproj.AssemblyReference.cache
 C:\Users\fgeorgantzos\source\repos\phil7geo\Thesis.courseWebApp.Backend\obj\Debug\net7.0\Thesis.courseWebApp.Backend.GeneratedMSBuildEditorConfig.editorconfig
 C:\Users\fgeorgantzos\source\repos\phil7geo\Thesis.courseWebApp.Backend\obj\Debug\net7.0\Thesis.courseWebApp.Backend.AssemblyInfoInputs.cache
 C:\Users\fgeorgantzos\source\repos\phil7geo\Thesis.courseWebApp.Backend\obj\Debug\net7.0\Thesis.courseWebApp.Backend.AssemblyInfo.cs
@@ -18,6 +28,7 @@ C:\Users\fgeorgantzos\source\repos\phil7geo\Thesis.courseWebApp.Backend\obj\Debu
 C:\Users\fgeorgantzos\source\repos\phil7geo\Thesis.courseWebApp.Backend\obj\Debug\net7.0\staticwebassets.build.json
 C:\Users\fgeorgantzos\source\repos\phil7geo\Thesis.courseWebApp.Backend\obj\Debug\net7.0\staticwebassets.development.json
 C:\Users\fgeorgantzos\source\repos\phil7geo\Thesis.courseWebApp.Backend\obj\Debug\net7.0\scopedcss\bundle\Thesis.courseWebApp.Backend.styles.css
+C:\Users\fgeorgantzos\source\repos\phil7geo\Thesis.courseWebApp.Backend\obj\Debug\net7.0\Thesis.courseWebApp.Backend.csproj.CopyComplete
 C:\Users\fgeorgantzos\source\repos\phil7geo\Thesis.courseWebApp.Backend\obj\Debug\net7.0\Thesis.courseWebApp.Backend.dll
 C:\Users\fgeorgantzos\source\repos\phil7geo\Thesis.courseWebApp.Backend\obj\Debug\net7.0\refint\Thesis.courseWebApp.Backend.dll
 C:\Users\fgeorgantzos\source\repos\phil7geo\Thesis.courseWebApp.Backend\obj\Debug\net7.0\Thesis.courseWebApp.Backend.pdb
