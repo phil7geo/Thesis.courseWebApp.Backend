@@ -8,11 +8,14 @@ C:\Users\fgeorgantzos\source\repos\phil7geo\Thesis.courseWebApp.Backend\bin\Debu
 C:\Users\fgeorgantzos\source\repos\phil7geo\Thesis.courseWebApp.Backend\bin\Debug\net7.0\HtmlAgilityPack.dll
 C:\Users\fgeorgantzos\source\repos\phil7geo\Thesis.courseWebApp.Backend\bin\Debug\net7.0\Microsoft.EntityFrameworkCore.dll
 C:\Users\fgeorgantzos\source\repos\phil7geo\Thesis.courseWebApp.Backend\bin\Debug\net7.0\Microsoft.EntityFrameworkCore.Abstractions.dll
+C:\Users\fgeorgantzos\source\repos\phil7geo\Thesis.courseWebApp.Backend\bin\Debug\net7.0\Microsoft.EntityFrameworkCore.Relational.dll
 C:\Users\fgeorgantzos\source\repos\phil7geo\Thesis.courseWebApp.Backend\bin\Debug\net7.0\microsoft.identitymodel.dll
 C:\Users\fgeorgantzos\source\repos\phil7geo\Thesis.courseWebApp.Backend\bin\Debug\net7.0\Microsoft.IdentityModel.Abstractions.dll
 C:\Users\fgeorgantzos\source\repos\phil7geo\Thesis.courseWebApp.Backend\bin\Debug\net7.0\Microsoft.IdentityModel.JsonWebTokens.dll
 C:\Users\fgeorgantzos\source\repos\phil7geo\Thesis.courseWebApp.Backend\bin\Debug\net7.0\Microsoft.IdentityModel.Logging.dll
 C:\Users\fgeorgantzos\source\repos\phil7geo\Thesis.courseWebApp.Backend\bin\Debug\net7.0\Microsoft.IdentityModel.Tokens.dll
+C:\Users\fgeorgantzos\source\repos\phil7geo\Thesis.courseWebApp.Backend\bin\Debug\net7.0\Npgsql.dll
+C:\Users\fgeorgantzos\source\repos\phil7geo\Thesis.courseWebApp.Backend\bin\Debug\net7.0\Npgsql.EntityFrameworkCore.PostgreSQL.dll
 C:\Users\fgeorgantzos\source\repos\phil7geo\Thesis.courseWebApp.Backend\bin\Debug\net7.0\System.IdentityModel.Tokens.Jwt.dll
 C:\Users\fgeorgantzos\source\repos\phil7geo\Thesis.courseWebApp.Backend\obj\Debug\net7.0\Thesis.courseWebApp.Backend.csproj.AssemblyReference.cache
 C:\Users\fgeorgantzos\source\repos\phil7geo\Thesis.courseWebApp.Backend\obj\Debug\net7.0\Thesis.courseWebApp.Backend.GeneratedMSBuildEditorConfig.editorconfig
