@@ -13,7 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Thesis.courseWebApp.Backend.Data;
 using Npgsql.EntityFrameworkCore.PostgreSQL;
-
+using Thesis.courseWebApp.Backend.Models;
 
 public class Program
 {
@@ -28,6 +28,8 @@ public class Program
          {
              webBuilder.ConfigureServices((context, services) =>
              {
+                 //services.AddTransient<EmailService>();
+
                  services.AddControllers();
                  services.AddDbContext<AppDbContext>(options =>
                      options.UseNpgsql(context.Configuration.GetConnectionString("DbConnection")));

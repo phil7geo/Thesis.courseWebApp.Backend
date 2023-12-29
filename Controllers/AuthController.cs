@@ -10,30 +10,34 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Thesis.courseWebApp.Backend.Models;
 using Thesis.courseWebApp.Backend.Data;
+using System.Security.Cryptography;
+using BCrypt.Net;
 
 namespace Thesis.courseWebApp.Backend.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api")]
     public class AuthController : ControllerBase
     {
         private readonly AppDbContext _dbContext;
         private readonly IConfiguration _configuration;
+        //private readonly EmailService _emailService;
 
         public AuthController(IConfiguration configuration, AppDbContext dbContext)
         {
             _configuration = configuration;
             _dbContext = dbContext;
+            //_emailService = emailService;
         }
 
         [HttpPost("register")]
-        public IActionResult Register([FromBody] RegistrationModel model)
+        public async Task<IActionResult> Register([FromBody] RegistrationModel model)
         {
             // Check if the user already exists
             //  replace this with your actual user repository or database check
-            bool userExists = _dbContext.Users.Any(u => u.Username == model.Username);
+            //bool userExists = _dbContext.Users.Any(u => u.Username == model.Username);
 
-            if (userExists)
+            if (model.Username == null)
             {
                 return BadRequest(new { Message = "Username already exists" });
             }
@@ -48,26 +52,25 @@ namespace Thesis.courseWebApp.Backend.Controllers
             // Save the user to the database, hash the password, etc.
 
             // For simplicity, let's assume registration is successful
-            return Ok(new { Message = "Registration successful" });
+            return Ok(new { Success = true, Message = "Registration successful", Username = model.Username });
         }
 
         [HttpPost("login")]
-        public IActionResult Login([FromBody] LoginModel model)
+        public async Task<IActionResult> Login([FromBody] LoginModel model)
         {
-            // login logic goes here
-            // Check if the username and password match, validate input, etc.
+            // login logic
 
             // Check if the user exists
             //  replace this with your actual user repository or database check
-            var user = _dbContext.Users.SingleOrDefault(u => u.Username == model.Username);
+            //var user = _dbContext.Users.SingleOrDefault(u => u.Username == model.Username);
 
-            if (user == null || !IsValidLogin(model, user))
+            if (model.Username == null || model.Username == null ||  !IsValidLogin(model))
             {
                 return BadRequest(new { Message = "Invalid username or password" });
             }
 
             // Validate other login inputs
-            if (!IsValidLogin(model, user))
+            if (!IsValidLogin(model))
             {
                 return BadRequest(new { Message = "Invalid login data" });
             }
@@ -77,17 +80,42 @@ namespace Thesis.courseWebApp.Backend.Controllers
 
             var token = GenerateJwtToken(model.Username);
 
-            return Ok(new { Token = token });
+            return Ok(new { Success = true, Username = model.Username, Token = token });
         }
 
         [HttpPost("password-reset")]
-        public IActionResult ResetPassword([FromBody] PasswordResetModel model)
+        public async Task<IActionResult> ResetPassword([FromBody] PasswordResetModel model)
         {
-            // password reset logic goes here
-            // Validate input, generate and send reset link/email, etc.
+            // Check if the email exists
+            //var user = await _dbContext.Users.SingleOrDefaultAsync(u => u.Email == model.Email);
 
-            // For simplicity, let's assume the reset is successful
-            return Ok(new { Message = "Password reset successful" });
+            if (model.Email == null)
+            {
+                return BadRequest(new { Message = "Email not found" });
+            }
+
+            // Validate other reset password inputs
+            if (!IsValidPasswordReset(model))
+            {
+                return BadRequest(new { Message = "Invalid password reset data" });
+            }
+
+            // Generate a unique reset token or link
+            var resetToken = GenerateResetToken();
+
+            // For simplicity, let's assume the reset link is sent successfully
+            // In a real-world scenario, you'd send an email with the reset link
+            // For example: SendResetEmail(user.Email, resetToken);
+            //_emailService.SendResetEmail(model.Email, resetToken);
+
+            // Update the user's password (for example, assuming it's stored hashed in the database)
+            string password = HashPassword(model.NewPassword); // Implement hashing logic
+
+            // Save changes to the database
+            //await _dbContext.SaveChangesAsync();
+
+            // Return a response indicating success
+            return Ok(new { Success = true, Message = "Password reset successful. Check your email for the reset link", NewPassword = model.NewPassword, HashedPassword = password, ResetToken = resetToken });
         }
 
         private bool CheckIfUserExists(string username)
@@ -105,7 +133,7 @@ namespace Thesis.courseWebApp.Backend.Controllers
             return true;
         }
 
-        private bool IsValidLogin(LoginModel model, User user)
+        private bool IsValidLogin(LoginModel model)
         {
             // Validate login inputs here
             // For example, check if the username and password meet certain criteria
@@ -115,14 +143,19 @@ namespace Thesis.courseWebApp.Backend.Controllers
 
         private string GenerateJwtToken(string username)
         {
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:SecretKey"]));
+            var keyBytes = new byte[32]; // 32 bytes = 256 bits
+            using (var rng = RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(keyBytes);
+            }
+
+            var securityKey = new SymmetricSecurityKey(keyBytes);
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
             var claims = new[]
             {
-            new Claim(ClaimTypes.Name, username),
-            // add more claims as needed
-        };
+                new Claim(ClaimTypes.Name, username),
+            };
 
             var token = new JwtSecurityToken(
                 issuer: _configuration["Jwt:Issuer"],
@@ -134,6 +167,51 @@ namespace Thesis.courseWebApp.Backend.Controllers
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+
+        private bool IsValidPasswordReset(PasswordResetModel model)
+        {
+            // Check if the old and new passwords meet certain criteria
+
+            // Check if the old password is provided
+            if (string.IsNullOrWhiteSpace(model.OldPassword))
+            {
+                return false;
+            }
+
+            // Check if the new password is provided
+            if (string.IsNullOrWhiteSpace(model.NewPassword))
+            {
+                return false;
+            }
+
+            // Check if the new password meets minimum length requirement
+            if (model.NewPassword.Length < 8)
+            {
+                return false;
+            }
+
+            // If all checks pass, return true
+            return true;
+        }
+
+        private string GenerateResetToken()
+        {
+            // enerate a unique reset token or link
+            // use a GUID
+            return Guid.NewGuid().ToString();
+        }
+
+        private string HashPassword(string password)
+        {
+            // logic to hash the password
+            // use a secure hashing algorithm like bcrypt
+            // Hash the password using bcrypt
+            string hashedPassword = BCrypt.Net.BCrypt.HashPassword(password);
+
+            return hashedPassword;
+        }
+
+
     }
 
 }

@@ -1,9 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "9e2Ml5Qx6SxSI2iPCV+SYjA+Fuj/ho7HWiIFsfcOEs5BduYrpXv/5TVPk3Chcj2MRezJu4LMRiKKH7KD3lZofw==",
+  "dgSpecHash": "y5rixOG3tdXLq1ELcI0JGapo/0GJh5DrJayRHB3+MFaa69L8aAWlgVeS6s2brZV6igI/LXukFWTc8iEDzrCjIg==",
   "success": true,
   "projectFilePath": "C:\\Users\\fgeorgantzos\\source\\repos\\phil7geo\\Thesis.courseWebApp.Backend\\Thesis.courseWebApp.Backend.csproj",
   "expectedPackageFiles": [
+    "C:\\Users\\fgeorgantzos\\.nuget\\packages\\bcrypt.net-next\\4.0.3\\bcrypt.net-next.4.0.3.nupkg.sha512",
     "C:\\Users\\fgeorgantzos\\.nuget\\packages\\htmlagilitypack\\1.11.55\\htmlagilitypack.1.11.55.nupkg.sha512",
     "C:\\Users\\fgeorgantzos\\.nuget\\packages\\microsoft.entityframeworkcore\\5.0.0\\microsoft.entityframeworkcore.5.0.0.nupkg.sha512",
     "C:\\Users\\fgeorgantzos\\.nuget\\packages\\microsoft.entityframeworkcore.abstractions\\5.0.0\\microsoft.entityframeworkcore.abstractions.5.0.0.nupkg.sha512",

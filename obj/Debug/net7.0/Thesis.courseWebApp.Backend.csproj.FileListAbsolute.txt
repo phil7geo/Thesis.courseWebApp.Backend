@@ -37,3 +37,4 @@ C:\Users\fgeorgantzos\source\repos\phil7geo\Thesis.courseWebApp.Backend\obj\Debu
 C:\Users\fgeorgantzos\source\repos\phil7geo\Thesis.courseWebApp.Backend\obj\Debug\net7.0\Thesis.courseWebApp.Backend.pdb
 C:\Users\fgeorgantzos\source\repos\phil7geo\Thesis.courseWebApp.Backend\obj\Debug\net7.0\Thesis.courseWebApp.Backend.genruntimeconfig.cache
 C:\Users\fgeorgantzos\source\repos\phil7geo\Thesis.courseWebApp.Backend\obj\Debug\net7.0\ref\Thesis.courseWebApp.Backend.dll
+C:\Users\fgeorgantzos\source\repos\phil7geo\Thesis.courseWebApp.Backend\bin\Debug\net7.0\BCrypt.Net-Next.dll
