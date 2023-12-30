@@ -21,39 +21,48 @@ namespace Thesis.courseWebApp.Backend.Controllers
     {
         private readonly AppDbContext _dbContext;
         private readonly IConfiguration _configuration;
+        private readonly ILogger<AuthController> _logger;
+
         //private readonly EmailService _emailService;
 
-        public AuthController(IConfiguration configuration, AppDbContext dbContext)
+        public AuthController(IConfiguration configuration, AppDbContext dbContext, ILogger<AuthController> logger)
         {
             _configuration = configuration;
             _dbContext = dbContext;
+            _logger = logger;
             //_emailService = emailService;
         }
 
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegistrationModel model)
         {
-            // Check if the user already exists
-            //  replace this with your actual user repository or database check
-            //bool userExists = _dbContext.Users.Any(u => u.Username == model.Username);
-
-            if (model.Username == null)
+            using (var transaction = await _dbContext.Database.BeginTransactionAsync())
             {
-                return BadRequest(new { Message = "Username already exists" });
+                try
+                {
+                    // Your registration logic goes here
+                    var newUser = new User { Username = model.Username };
+                    _dbContext.Users.Add(newUser);
+
+                    var result = await _dbContext.SaveChangesAsync();
+
+                    await transaction.CommitAsync(); // Commit the transaction
+
+                    Console.WriteLine($"Number of changes: {result}");
+                    _logger.LogInformation($"User added successfully: {newUser.Id}");
+
+                    return Ok(new { Success = true, Message = "Registration successful", Username = model.Username });
+                }
+                catch (Exception ex)
+                {
+                    await transaction.RollbackAsync(); // Rollback the transaction in case of an exception
+                    _logger.LogError($"Error adding user: {ex.Message}\n{ex.StackTrace}");
+                    throw; // Rethrow the exception to ensure it's not silently ignored
+                }
             }
-
-            // Validate other registration inputs
-            if (!IsValidRegistration(model))
-            {
-                return BadRequest(new { Message = "Invalid registration data" });
-            }
-
-            // registration logic goes here
-            // Save the user to the database, hash the password, etc.
-
-            // For simplicity, let's assume registration is successful
-            return Ok(new { Success = true, Message = "Registration successful", Username = model.Username });
         }
+
+
 
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginModel model)

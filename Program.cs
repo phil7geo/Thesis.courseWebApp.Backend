@@ -1,9 +1,3 @@
-//var builder = WebApplication.CreateBuilder(args);
-//var app = builder.Build();
-
-//app.MapGet("/", () => "Hello World!");
-
-//app.Run();
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using Microsoft.AspNetCore.Builder;
@@ -34,7 +28,7 @@ public class Program
                  services.AddDbContext<AppDbContext>(options =>
                      options.UseNpgsql(context.Configuration.GetConnectionString("DbConnection")));
 
-                 services.AddCors(options =>
+             services.AddCors(options =>
                     {
                         options.AddPolicy("AllowReactFrontend",
                             builder => builder
