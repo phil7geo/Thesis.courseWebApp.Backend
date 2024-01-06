@@ -9,6 +9,13 @@ namespace Thesis.courseWebApp.Backend.Data
 
         [Column("Username")]
         public string Username { get; set; }
-        // Add other properties as needed
+
+        [Column("Email")]
+        public string Email { get; set; }
+
+        [Column("Hashed_password")]
+        public string Password { get; set; }
+
+        public UserSession Session { get; set; }
     }
 }

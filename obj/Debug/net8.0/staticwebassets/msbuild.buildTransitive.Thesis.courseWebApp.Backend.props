@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\buildMultiTargeting\Thesis.courseWebApp.Backend.props" />
+</Project>

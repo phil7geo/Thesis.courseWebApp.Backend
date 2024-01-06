@@ -12,6 +12,7 @@ using Thesis.courseWebApp.Backend.Models;
 using Thesis.courseWebApp.Backend.Data;
 using System.Security.Cryptography;
 using BCrypt.Net;
+using System.Text.RegularExpressions;
 
 namespace Thesis.courseWebApp.Backend.Controllers
 {
@@ -40,10 +41,41 @@ namespace Thesis.courseWebApp.Backend.Controllers
             {
                 try
                 {
-                    // Your registration logic goes here
-                    var newUser = new User { Username = model.Username };
+                    // Validate registration inputs
+                    if (!IsValidRegistration(model))
+                    {
+                        return BadRequest(new { Message = "Invalid registration data" });
+                    }
+
+                    // Check if the username already exists
+                    if (CheckIfUsernameExists(model.Username) && CheckIfEmailExists(model.Email))
+                    {
+                        return BadRequest(new { Message = "Username and Email already exists" });
+                    }
+                    else if (CheckIfEmailExists(model.Email))
+                    {
+                        return BadRequest(new { Message = "Email already exists" });
+                    }
+                    else if (CheckIfUsernameExists(model.Username))
+                    {
+                        return BadRequest(new { Message = "Username already exists" });
+                    }
+
+                    // Hash the password
+                    string hashedPassword = HashPassword(model.Password);
+
+                    // Create a new User entity with email, username, and hashed password
+                    var newUser = new User
+                    {
+                        Email = model.Email,
+                        Username = model.Username,
+                        Password = hashedPassword
+                    };
+
+                    // Add the user to the Users table
                     _dbContext.Users.Add(newUser);
 
+                    // Save changes to the database
                     var result = await _dbContext.SaveChangesAsync();
 
                     await transaction.CommitAsync(); // Commit the transaction
@@ -67,29 +99,25 @@ namespace Thesis.courseWebApp.Backend.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginModel model)
         {
-            // login logic
-
-            // Check if the user exists
-            //  replace this with your actual user repository or database check
-            //var user = _dbContext.Users.SingleOrDefault(u => u.Username == model.Username);
-
-            if (model.Username == null || model.Username == null ||  !IsValidLogin(model))
-            {
-                return BadRequest(new { Message = "Invalid username or password" });
-            }
-
             // Validate other login inputs
             if (!IsValidLogin(model))
             {
                 return BadRequest(new { Message = "Invalid login data" });
             }
 
-            // For simplicity, let's assume login is successful
-            // Generate and return a JWT token as a response
+            var user = await _dbContext.Users.SingleOrDefaultAsync(u => u.Username == model.Username);
 
+            if (user == null || !VerifyPassword(model.Password, user.Password))
+            {
+                return BadRequest(new { Message = "Invalid username or password. Please use valid credentials" });
+            }
+
+            var sessionId = await GenerateAndStoreSession(user.Id);
+
+            // Generate and return a JWT token as a response
             var token = GenerateJwtToken(model.Username);
 
-            return Ok(new { Success = true, Username = model.Username, Token = token });
+            return Ok(new { Success = true, Username = model.Username, Token = token, SessionId = sessionId });
         }
 
         [HttpPost("password-reset")]
@@ -127,26 +155,90 @@ namespace Thesis.courseWebApp.Backend.Controllers
             return Ok(new { Success = true, Message = "Password reset successful. Check your email for the reset link", NewPassword = model.NewPassword, HashedPassword = password, ResetToken = resetToken });
         }
 
-        private bool CheckIfUserExists(string username)
+        private async Task<string> GenerateAndStoreSession(int userId)
         {
-            // Replace this with your actual user repository or database check
-            // Return true if the user exists, false otherwise
+            var sessionId = Guid.NewGuid().ToString();
+
+            var userSession = new UserSession
+            {
+                UserId = userId,
+                SessionId = sessionId,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            _dbContext.UserSessions.Add(userSession);
+            await _dbContext.SaveChangesAsync();
+
+            return sessionId;
+        }
+
+
+        private bool CheckIfUsernameExists(string username)
+        {
+            var userByUsernameCount = _dbContext.Users.Count(u => u.Username == username) > 0;
+
+            if (userByUsernameCount)
+            {
+                ModelState.AddModelError("username", "The username already exists");
+                return true;
+            }
+
             return false;
         }
 
+        private bool CheckIfEmailExists(string email)
+        {
+            var userByEmailCount = _dbContext.Users.Count(u => u.Email == email) > 0;
+
+            if (userByEmailCount)
+            {
+                ModelState.AddModelError("email", "The email already exists");
+                return true;
+            }
+
+            return false;
+        }
+
+
+
         private bool IsValidRegistration(RegistrationModel model)
         {
-            // Validate registration inputs here
-            // For example, check if the username and password meet certain criteria
-            // Return true if valid, false otherwise
+            if (!Regex.IsMatch(model.Email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
+            {
+                ModelState.AddModelError("email", "Enter a valid email address.");
+                return false;
+            }
+
+            if (!Regex.IsMatch(model.Username, @"^(?=.*\d)[a-zA-Z0-9]{6,}$"))
+            {
+                ModelState.AddModelError("username", "Username must be at least 6 characters and contain at least one digit.");
+                return false;
+            }
+
+            if (!Regex.IsMatch(model.Password, @"^(?=.*\d)(?=.*[a-zA-Z]).{6,}$"))
+            {
+                ModelState.AddModelError("password", "Password must contain at least 6 characters with at least one letter and one digit.");
+                return false;
+            }
+
             return true;
         }
 
+
         private bool IsValidLogin(LoginModel model)
         {
-            // Validate login inputs here
-            // For example, check if the username and password meet certain criteria
-            // Return true if valid, false otherwise
+            if (!Regex.IsMatch(model.Username, @"^(?=.*\d)[a-zA-Z0-9]{6,}$"))
+            {
+                ModelState.AddModelError("username", "Username must be at least 6 characters and contain at least one digit.");
+                return false;
+            }
+
+            if (!Regex.IsMatch(model.Password, @"^(?=.*\d)(?=.*[a-zA-Z]).{6,}$"))
+            {
+                ModelState.AddModelError("password", "Password must contain at least 6 characters with at least one letter and one digit.");
+                return false;
+            }
+
             return true;
         }
 
@@ -218,6 +310,11 @@ namespace Thesis.courseWebApp.Backend.Controllers
             string hashedPassword = BCrypt.Net.BCrypt.HashPassword(password);
 
             return hashedPassword;
+        }
+
+        private bool VerifyPassword(string enteredPassword, string hashedPassword)
+        {
+            return BCrypt.Net.BCrypt.Verify(enteredPassword, hashedPassword);
         }
 
 
