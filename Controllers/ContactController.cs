@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Thesis.courseWebApp.Backend.Models;
+using Thesis.courseWebApp.Backend.Data;
 
 namespace Thesis.courseWebApp.Backend.Controllers
 {
@@ -11,11 +12,13 @@ namespace Thesis.courseWebApp.Backend.Controllers
     {
         //private readonly ContactMessageRepository _messageRepository;
         //private readonly EmailService _emailService;
+        private readonly AppDbContext _dbContext;
 
-        public ContactController( )
+        public ContactController(AppDbContext dbContext)
         {
             //_messageRepository = messageRepository;
             //_emailService = emailService;
+            _dbContext = dbContext;
         }
 
         [HttpPost("contact/send-message")]
@@ -29,23 +32,25 @@ namespace Thesis.courseWebApp.Backend.Controllers
                     return BadRequest(new { Message = "Invalid message format" });
                 }
 
-                // Check if the email already exists in the database
-                //if (_messageRepository.EmailExists(model.Email))
-                if (model.Email == null)
-                {
-                    return BadRequest(new { Message = "Email already exists" });
-                }
-
                 // Save the message to the database
-                //var messageId = _messageRepository.SaveMessage(model);
+                var message = new Message
+                {
+                    FullName = model.FullName,
+                    Email = model.Email,
+                    PhoneNumber = model.PhoneNumber,
+                    MessageContent = model.Message,
+                    CreatedAt = DateTime.UtcNow
+                };
 
-                var message = model.Message;
+                // Add the user to the Messages DB table
+                _dbContext.Messages.Add(message);
+                // Save changes to the database
+                await _dbContext.SaveChangesAsync();
 
-                // Send an email (assuming you have an email service)
-                //_emailService.SendEmail(model.Email, "Subject", "Body");
+                var messageContent = message.MessageContent;
 
                 // For simplicity, let's assume the message is sent successfully
-                return Ok(new { Success = true, Message = "Message sent successfully", MessageSent = message });
+                return Ok(new { Success = true, Message = "Message sent successfully", MessageSent = messageContent });
             }
             catch (Exception ex)
             {

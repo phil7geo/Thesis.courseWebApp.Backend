@@ -124,9 +124,9 @@ namespace Thesis.courseWebApp.Backend.Controllers
         public async Task<IActionResult> ResetPassword([FromBody] PasswordResetModel model)
         {
             // Check if the email exists
-            //var user = await _dbContext.Users.SingleOrDefaultAsync(u => u.Email == model.Email);
+            var user = await _dbContext.Users.SingleOrDefaultAsync(u => u.Email == model.Email);
 
-            if (model.Email == null)
+            if (user == null)
             {
                 return BadRequest(new { Message = "Email not found" });
             }
@@ -137,23 +137,28 @@ namespace Thesis.courseWebApp.Backend.Controllers
                 return BadRequest(new { Message = "Invalid password reset data" });
             }
 
+            // Verify the old password
+            if (!VerifyPassword(model.OldPassword, user.Password))
+            {
+                return BadRequest(new { Message = "Invalid old password" });
+            }
+
             // Generate a unique reset token or link
             var resetToken = GenerateResetToken();
 
-            // For simplicity, let's assume the reset link is sent successfully
-            // In a real-world scenario, you'd send an email with the reset link
-            // For example: SendResetEmail(user.Email, resetToken);
-            //_emailService.SendResetEmail(model.Email, resetToken);
+            // Hash the new password
+            string hashedPassword = HashPassword(model.NewPassword);
 
-            // Update the user's password (for example, assuming it's stored hashed in the database)
-            string password = HashPassword(model.NewPassword); // Implement hashing logic
+            // Update the user's password in the database
+            user.Password = hashedPassword;
 
             // Save changes to the database
-            //await _dbContext.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync();
 
             // Return a response indicating success
-            return Ok(new { Success = true, Message = "Password reset successful. Check your email for the reset link", NewPassword = model.NewPassword, HashedPassword = password, ResetToken = resetToken });
+            return Ok(new { Success = true, Message = "Password reset successful", NewPassword = model.NewPassword, HashedPassword = hashedPassword });
         }
+
 
         private async Task<string> GenerateAndStoreSession(int userId)
         {

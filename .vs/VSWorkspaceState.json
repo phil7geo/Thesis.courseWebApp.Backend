@@ -3,8 +3,8 @@
     "",
     "\\Controllers",
     "\\Data",
+    "\\Migrations",
     "\\Models"
   ],
-  "SelectedNode": "\\Thesis.courseWebApp.Backend.csproj",
   "PreviewInSolutionExplorer": false
 }
