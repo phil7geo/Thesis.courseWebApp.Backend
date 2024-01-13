@@ -15,6 +15,7 @@ C:\Users\fgeorgantzos\source\repos\phil7geo\Thesis.courseWebApp.Backend\bin\Debu
 C:\Users\fgeorgantzos\source\repos\phil7geo\Thesis.courseWebApp.Backend\bin\Debug\net8.0\BCrypt.Net-Next.dll
 C:\Users\fgeorgantzos\source\repos\phil7geo\Thesis.courseWebApp.Backend\bin\Debug\net8.0\HtmlAgilityPack.dll
 C:\Users\fgeorgantzos\source\repos\phil7geo\Thesis.courseWebApp.Backend\bin\Debug\net8.0\Humanizer.dll
+C:\Users\fgeorgantzos\source\repos\phil7geo\Thesis.courseWebApp.Backend\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
 C:\Users\fgeorgantzos\source\repos\phil7geo\Thesis.courseWebApp.Backend\bin\Debug\net8.0\Microsoft.Bcl.AsyncInterfaces.dll
 C:\Users\fgeorgantzos\source\repos\phil7geo\Thesis.courseWebApp.Backend\bin\Debug\net8.0\Microsoft.CodeAnalysis.dll
 C:\Users\fgeorgantzos\source\repos\phil7geo\Thesis.courseWebApp.Backend\bin\Debug\net8.0\Microsoft.CodeAnalysis.CSharp.dll
@@ -29,6 +30,8 @@ C:\Users\fgeorgantzos\source\repos\phil7geo\Thesis.courseWebApp.Backend\bin\Debu
 C:\Users\fgeorgantzos\source\repos\phil7geo\Thesis.courseWebApp.Backend\bin\Debug\net8.0\Microsoft.IdentityModel.Abstractions.dll
 C:\Users\fgeorgantzos\source\repos\phil7geo\Thesis.courseWebApp.Backend\bin\Debug\net8.0\Microsoft.IdentityModel.JsonWebTokens.dll
 C:\Users\fgeorgantzos\source\repos\phil7geo\Thesis.courseWebApp.Backend\bin\Debug\net8.0\Microsoft.IdentityModel.Logging.dll
+C:\Users\fgeorgantzos\source\repos\phil7geo\Thesis.courseWebApp.Backend\bin\Debug\net8.0\Microsoft.IdentityModel.Protocols.dll
+C:\Users\fgeorgantzos\source\repos\phil7geo\Thesis.courseWebApp.Backend\bin\Debug\net8.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
 C:\Users\fgeorgantzos\source\repos\phil7geo\Thesis.courseWebApp.Backend\bin\Debug\net8.0\Microsoft.IdentityModel.Tokens.dll
 C:\Users\fgeorgantzos\source\repos\phil7geo\Thesis.courseWebApp.Backend\bin\Debug\net8.0\Mono.TextTemplating.dll
 C:\Users\fgeorgantzos\source\repos\phil7geo\Thesis.courseWebApp.Backend\bin\Debug\net8.0\Npgsql.dll
@@ -106,3 +109,4 @@ C:\Users\fgeorgantzos\source\repos\phil7geo\Thesis.courseWebApp.Backend\obj\Debu
 C:\Users\fgeorgantzos\source\repos\phil7geo\Thesis.courseWebApp.Backend\obj\Debug\net8.0\Thesis.courseWebApp.Backend.pdb
 C:\Users\fgeorgantzos\source\repos\phil7geo\Thesis.courseWebApp.Backend\obj\Debug\net8.0\Thesis.courseWebApp.Backend.genruntimeconfig.cache
 C:\Users\fgeorgantzos\source\repos\phil7geo\Thesis.courseWebApp.Backend\obj\Debug\net8.0\ref\Thesis.courseWebApp.Backend.dll
+C:\Users\fgeorgantzos\source\repos\phil7geo\Thesis.courseWebApp.Backend\bin\Debug\net8.0\Newtonsoft.Json.dll

@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations.Schema;
+using Newtonsoft.Json;
 
 namespace Thesis.courseWebApp.Backend.Data
 {
@@ -16,7 +17,8 @@ namespace Thesis.courseWebApp.Backend.Data
         [Column("Created_at")]
         public DateTime CreatedAt { get; set; }
 
-        [ForeignKey("UserId")] // Define the foreign key relationship
+        [ForeignKey("UserId")]
+        [JsonIgnore]
         public User User { get; set; }
     }
 }

@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations.Schema;
+using Newtonsoft.Json;
 
 namespace Thesis.courseWebApp.Backend.Data
 {
@@ -16,6 +17,7 @@ namespace Thesis.courseWebApp.Backend.Data
         [Column("Hashed_password")]
         public string Password { get; set; }
 
+        [JsonIgnore]
         public UserSession Session { get; set; }
     }
 }

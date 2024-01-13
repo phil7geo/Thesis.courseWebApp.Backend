@@ -13,6 +13,8 @@ using Thesis.courseWebApp.Backend.Data;
 using System.Security.Cryptography;
 using BCrypt.Net;
 using System.Text.RegularExpressions;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Configuration;
 
 namespace Thesis.courseWebApp.Backend.Controllers
 {
@@ -94,8 +96,6 @@ namespace Thesis.courseWebApp.Backend.Controllers
             }
         }
 
-
-
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginModel model)
         {
@@ -105,7 +105,8 @@ namespace Thesis.courseWebApp.Backend.Controllers
                 return BadRequest(new { Message = "Invalid login data" });
             }
 
-            var user = await _dbContext.Users.SingleOrDefaultAsync(u => u.Username == model.Username);
+            var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Username == model.Username);
+
 
             if (user == null || !VerifyPassword(model.Password, user.Password))
             {
@@ -114,10 +115,20 @@ namespace Thesis.courseWebApp.Backend.Controllers
 
             var sessionId = await GenerateAndStoreSession(user.Id);
 
+            // Generate and set HttpContext.User with the user claims
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, model.Username),
+            };
+
+            var identity = new ClaimsIdentity(claims, JwtBearerDefaults.AuthenticationScheme);
+
+            HttpContext.User = new ClaimsPrincipal(identity);
+
             // Generate and return a JWT token as a response
             var token = GenerateJwtToken(model.Username);
 
-            return Ok(new { Success = true, Username = model.Username, Token = token, SessionId = sessionId });
+            return Ok(new { Success = true, Username = model.Username, Token = token, SessionId = sessionId, AuthenticatedUser = HttpContext.User});
         }
 
         [HttpPost("password-reset")]
@@ -157,6 +168,94 @@ namespace Thesis.courseWebApp.Backend.Controllers
 
             // Return a response indicating success
             return Ok(new { Success = true, Message = "Password reset successful", NewPassword = model.NewPassword, HashedPassword = hashedPassword });
+        }
+
+        [HttpGet("check-auth")]
+        public async Task<IActionResult> CheckAuth()
+        {
+            try
+            {
+                var token = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+                Console.WriteLine($"Received token: {token}");
+
+                if (string.IsNullOrEmpty(token))
+                {
+                    return Ok(new { IsLoggedIn = false, Message = "Token is missing" });
+                }
+
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var key = Encoding.UTF8.GetBytes(_configuration["Jwt:SecretKey"]);
+
+                Console.WriteLine($"Secret key: {key}");
+                Console.WriteLine($"Issuer: {_configuration["Jwt:Issuer"]}");
+                Console.WriteLine($"Audience: {_configuration["Jwt:Audience"]}");
+
+                var validationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = _configuration["Jwt:Issuer"],
+                    ValidAudience = _configuration["Jwt:Audience"],
+                    IssuerSigningKey = new SymmetricSecurityKey(key)
+                };
+
+                SecurityToken validatedToken;
+                var principal = tokenHandler.ValidateToken(token, validationParameters, out validatedToken);
+
+                var usernameClaim = principal.FindFirst(ClaimTypes.Name);
+                var username = usernameClaim?.Value;
+
+                // Log additional information
+                Console.WriteLine($"Token validated successfully for user: {username}");
+
+                return Ok(new { IsLoggedIn = true, Username = username });
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                Console.WriteLine($"Token validation failed. Exception: {ex.Message}");
+                return Ok(new { IsLoggedIn = false, Message = "Token validation failed" });
+            }
+        }
+
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout()
+        {
+            try
+            {
+                // Get the token from the request header
+                var token = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+                Console.WriteLine("Token for logout: ", token);
+                IsTokenValid(token);
+
+                if (string.IsNullOrEmpty(token))
+                {
+                    return Ok(new { IsLoggedIn = false, Message = "Token is missing" });
+                }
+
+                // Remove the user session from the database
+                // Assuming you have the userId stored in the token, fetch the user session based on userId
+                var userId = GetUserIdFromToken(token);
+                var userSession = await _dbContext.UserSessions.FirstOrDefaultAsync(us => us.UserId == userId);
+
+                if (userSession != null)
+                {
+                    _dbContext.UserSessions.Remove(userSession);
+                    await _dbContext.SaveChangesAsync();
+                }
+
+                // Invalidate the JWT token (optional, depending on your requirements)
+                // You can add token revocation logic or simply ignore the token on the client side
+
+                return Ok(new { Success = true, Message = "Logout successful" });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred during logout: {ex.Message}");
+                return StatusCode(500, new { Success = false, Message = "An error occurred during logout", Error = ex.Message });
+            }
         }
 
 
@@ -249,19 +348,14 @@ namespace Thesis.courseWebApp.Backend.Controllers
 
         private string GenerateJwtToken(string username)
         {
-            var keyBytes = new byte[32]; // 32 bytes = 256 bits
-            using (var rng = RandomNumberGenerator.Create())
-            {
-                rng.GetBytes(keyBytes);
-            }
-
-            var securityKey = new SymmetricSecurityKey(keyBytes);
+            var key = Encoding.UTF8.GetBytes(_configuration["Jwt:SecretKey"]);
+            var securityKey = new SymmetricSecurityKey(key);
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
             var claims = new[]
             {
-                new Claim(ClaimTypes.Name, username),
-            };
+        new Claim(ClaimTypes.Name, username),
+    };
 
             var token = new JwtSecurityToken(
                 issuer: _configuration["Jwt:Issuer"],
@@ -320,6 +414,43 @@ namespace Thesis.courseWebApp.Backend.Controllers
         private bool VerifyPassword(string enteredPassword, string hashedPassword)
         {
             return BCrypt.Net.BCrypt.Verify(enteredPassword, hashedPassword);
+        }
+
+        private int GetUserIdFromToken(string token)
+        {
+            // Extract the user ID from the JWT token
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.UTF8.GetBytes(_configuration["Jwt:SecretKey"]);
+
+            var validationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                ValidIssuer = _configuration["Jwt:Issuer"],
+                ValidAudience = _configuration["Jwt:Audience"],
+                IssuerSigningKey = new SymmetricSecurityKey(key)
+            };
+
+            SecurityToken validatedToken;
+            var principal = tokenHandler.ValidateToken(token, validationParameters, out validatedToken);
+
+            var userIdClaim = principal.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim != null && int.TryParse(userIdClaim.Value, out int userId))
+            {
+                return userId;
+            }
+
+            // Return a default value or throw an exception based on your requirements
+            return 0;
+        }
+
+        private bool IsTokenValid(string token)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var isValid = tokenHandler.CanReadToken(token);
+            return isValid;
         }
 
 

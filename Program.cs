@@ -8,6 +8,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Thesis.courseWebApp.Backend.Data;
 using Npgsql.EntityFrameworkCore.PostgreSQL;
 using Thesis.courseWebApp.Backend.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 public class Program
 {
@@ -22,13 +27,18 @@ public class Program
          {
              webBuilder.ConfigureServices((context, services) =>
              {
+                 IConfiguration configuration = context.Configuration;
                  //services.AddTransient<EmailService>();
 
-                 services.AddControllers();
+                 services.AddControllers()
+                     .AddJsonOptions(options =>
+                     {
+                         options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
+                     });
                  services.AddDbContext<AppDbContext>(options =>
-                     options.UseNpgsql(context.Configuration.GetConnectionString("DbConnection")));
+                    options.UseNpgsql(context.Configuration.GetConnectionString("DbConnection")));
 
-             services.AddCors(options =>
+                    services.AddCors(options =>
                     {
                         options.AddPolicy("AllowReactFrontend",
                             builder => builder
@@ -36,7 +46,22 @@ public class Program
                                 .AllowAnyHeader()
                                 .AllowAnyMethod());
                     });
-                })
+
+                 services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                  .AddJwtBearer(options =>
+                  {
+                      options.TokenValidationParameters = new TokenValidationParameters
+                      {
+                          ValidateIssuer = true,
+                          ValidateAudience = true,
+                          ValidateLifetime = true,
+                          ValidateIssuerSigningKey = true,
+                          ValidIssuer = configuration["Jwt:Issuer"],
+                          ValidAudience = configuration["Jwt:Audience"],
+                          IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:SecretKey"]))
+                      };
+                  });
+             })
                 .Configure(app =>
                 {
                     var env = app.ApplicationServices.GetRequiredService<IHostEnvironment>();
@@ -49,6 +74,7 @@ public class Program
                     app.UseHttpsRedirection();
                     app.UseRouting();
                     app.UseCors("AllowReactFrontend");
+                    app.UseAuthentication();
                     app.UseAuthorization();
 
                     app.UseEndpoints(endpoints =>
