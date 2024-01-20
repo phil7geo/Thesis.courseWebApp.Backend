@@ -61,6 +61,12 @@ public class Program
                           IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:SecretKey"]))
                       };
                   });
+
+                 // Register RnnModel
+                 services.AddScoped<RnnModel>();
+
+                 // Register RnnModelService
+                 services.AddScoped<RnnModelService>();
              })
                 .Configure(app =>
                 {

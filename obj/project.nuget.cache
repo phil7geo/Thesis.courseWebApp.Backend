@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "tOh6ha4UERr4vOADLZyOBYUVEaIcGtCqTT+KFYmO3/SqmGiGdb11DR494Vw4mave5uQc0KXuaZuQVoV1QelbZw==",
+  "dgSpecHash": "nv2VRuPYK5XfP6GLmu//KNQDUSUc7HpNJ/IYErj3+vp2jWBw4N5DcXqzefyUaCY23JUna3KqqY2l8wQl6qw7DA==",
   "success": true,
   "projectFilePath": "C:\\Users\\fgeorgantzos\\source\\repos\\phil7geo\\Thesis.courseWebApp.Backend\\Thesis.courseWebApp.Backend.csproj",
   "expectedPackageFiles": [
@@ -58,6 +58,12 @@
     "C:\\Users\\fgeorgantzos\\.nuget\\packages\\system.threading.channels\\6.0.0\\system.threading.channels.6.0.0.nupkg.sha512"
   ],
   "logs": [
+    {
+      "code": "NU1803",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "You are running the 'restore' operation with an 'HTTP' source, 'http://nuget.dev-srv2.local/nuget'. Non-HTTPS access will be removed in a future version. Consider migrating to an 'HTTPS' source."
+    },
     {
       "code": "NU1903",
       "level": "Warning",

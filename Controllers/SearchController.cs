@@ -15,10 +15,12 @@ namespace Thesis.courseWebApp.Backend.Controllers
     public class SearchController : ControllerBase
     {
         private readonly AppDbContext _dbContext;
+        private readonly RnnModelService _rnnModelService;
 
-        public SearchController(AppDbContext dbContext)
+        public SearchController(AppDbContext dbContext, RnnModelService rnnModelService)
         {
             _dbContext = dbContext;
+            _rnnModelService = rnnModelService;
         }
 
         [HttpPost("search")]
@@ -47,8 +49,43 @@ namespace Thesis.courseWebApp.Backend.Controllers
                 // Handle exceptions and return an appropriate error response
                 return StatusCode(500, new { Message = "Internal Server Error", Error = ex.Message
             });
+            }
         }
-    }
+
+        [HttpPost("predictions")]
+        public async Task<IActionResult> Predictions([FromBody] PredictInput input)
+        {
+            try
+            {
+                // Implement logic to process user input and get predictions from RNN model
+                var predictions = await GetPredictionsFromRNN(input.UserInput);
+
+                return Ok(new { Predictions = predictions });
+            }
+            catch (Exception ex)
+            {
+                // Handle exceptions and return an appropriate error response
+                return StatusCode(500, new { Message = "Internal Server Error", Error = ex.Message });
+            }
+        }
+
+
+        private async Task<List<string>> GetPredictionsFromRNN(string userInput)
+        {
+            try
+            {
+                var preprocessedInput = _rnnModelService.PreprocessUserInput(userInput);
+                var predictions = await _rnnModelService.Predict(preprocessedInput);
+                var predictedData = _rnnModelService.ProcessPredictions(predictions);
+
+                return predictedData;
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error getting predictions: {ex.Message}");
+                return new List<string>();
+            }
+        }
 
         private async Task<List<Course>> GetResultsFromWeb(SearchCriteria criteria)
         {
