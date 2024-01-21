@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Thesis.courseWebApp.Backend.Data;
 using Thesis.courseWebApp.Backend.Models;
 using System.Net;
+using Newtonsoft.Json;
 
 namespace Thesis.courseWebApp.Backend.Controllers
 {
@@ -24,31 +25,48 @@ namespace Thesis.courseWebApp.Backend.Controllers
         }
 
         [HttpPost("search")]
-        public async Task<IActionResult> Search([FromBody] SearchCriteria criteria)      
+        public async Task<IActionResult> Search([FromBody] SearchCriteria criteria)
         {
-            // existing search logic with database queries
-            //var resultsFromDatabase = _dbContext.Courses
-            //    .Where(c => c.Level == criteria.Level && criteria.Subjects.Any(s => c.Subjects.Contains(s)) && c.Duration == criteria.Duration)
-            //    .ToList();
-
-
             try
             {
-                //Web scraping logic to get results from e-course sites
-                var resultsFromWeb = await GetResultsFromWeb(criteria);
+                // Query the Courses table based on the specified filters
+                var resultsFromDatabase = _dbContext.Courses
+                    .Where(c =>
+                        (string.IsNullOrEmpty(criteria.Level) || c.Level == criteria.Level) &&
+                        (criteria.Subject == null || criteria.Subject.All(s => c.Subject.Contains(s))) &&
+                        (string.IsNullOrEmpty(criteria.Duration) || c.Duration == criteria.Duration) &&
+                        (!criteria.OnSale || c.OnSale) &&
+                        (criteria.Rating <= 0 || c.Rating >= criteria.Rating) &&
+                        ((criteria.PriceRange == null || criteria.PriceRange.Length != 2) ||
+                            (c.Price >= (decimal)criteria.PriceRange[0] && c.Price <= (decimal)criteria.PriceRange[1])) &&
+                        (!criteria.Certification || c.Certification) &&
+                        (criteria.Language == null || criteria.Language.Length == 0 || criteria.Language.Contains(c.Language)) &&
+                        (string.IsNullOrEmpty(criteria.CourseFormat) || c.CourseFormat == criteria.CourseFormat) &&
+                        (string.IsNullOrEmpty(criteria.Location) || c.Location == criteria.Location) &&
+                        (string.IsNullOrEmpty(criteria.Town) || c.Town == criteria.Town)
+                    )
+                    .ToList();
 
-                //// Combine results from the database and web scraping
-                //var allResults = resultsFromDatabase.Concat(resultsFromWeb).ToList();
+                Console.WriteLine($"Criteria: {JsonConvert.SerializeObject(criteria)}");
+                Console.WriteLine($"Subject: {criteria.Subject}");
+                Console.WriteLine($"Duration: {criteria.Duration}");
+                Console.WriteLine($"OnSale: {criteria.OnSale}");
+                Console.WriteLine($"Certification: {criteria.Certification}");
+                Console.WriteLine($"Rating: {criteria.Rating}");
+                Console.WriteLine($"Language: {criteria.Language}");
 
-                //return Ok(allResults);
+                Console.WriteLine($"Generated SQL Query: {_dbContext.Courses.ToQueryString()}");
+                Console.WriteLine($"Results from Courses Db table: {JsonConvert.SerializeObject(resultsFromDatabase)}");
 
-                return Ok(new { Message = "Success", Results = resultsFromWeb });
+                return Ok(new { Message = "Success", Results = resultsFromDatabase });
             }
             catch (Exception ex)
             {
+                // Log detailed error message
+                Console.WriteLine($"Error during database query: {ex.Message}");
+
                 // Handle exceptions and return an appropriate error response
-                return StatusCode(500, new { Message = "Internal Server Error", Error = ex.Message
-            });
+                return StatusCode(500, new { Message = "Internal Server Error", Error = ex.Message });
             }
         }
 
@@ -87,70 +105,7 @@ namespace Thesis.courseWebApp.Backend.Controllers
             }
         }
 
-        private async Task<List<Course>> GetResultsFromWeb(SearchCriteria criteria)
-        {
-            // Implement web scraping logic here
-            // Example using HtmlAgilityPack and Udemy as a reference (modify as needed)
-            var udemyResults = await ScrapeUdemy(criteria);
-
-            // Add more web scraping logic for other e-course sites
-
-            return udemyResults;
-        }
-
-        private async Task<List<Course>> ScrapeUdemy(SearchCriteria criteria)
-        {
-            var udemyResults = new List<Course>();
-
-            // Example Udemy URL (modify based on Udemy's search URL structure)
-            var udemyUrl = $"https://www.udemy.com/courses/search/?q={criteria.Subjects}&price={criteria.PriceRange}&language={criteria.Language}";
-
-            // Send HTTP request and load HTML content
-            using (var httpClient = new HttpClient())
-            {
-                // Add User-Agent header
-                httpClient.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36");
-
-                try
-                {
-                    var htmlContent = await httpClient.GetStringAsync(udemyUrl);
-
-                    // Parse HTML content using HtmlAgilityPack
-                    var htmlDocument = new HtmlDocument();
-                    htmlDocument.LoadHtml(htmlContent);
-
-                    // Extract course information from HTML nodes
-                    // Modify this part based on the actual structure of Udemy's search results page
-                    var courseNodes = htmlDocument.DocumentNode.SelectNodes("//div[@class='course-card--container']");
-                    if (courseNodes != null)
-                    {
-                        foreach (var courseNode in courseNodes)
-                        {
-                            var courseTitle = courseNode.SelectSingleNode(".//h4")?.InnerText.Trim();
-                            var courseLink = courseNode.SelectSingleNode(".//a")?.GetAttributeValue("href", "");
-
-                            // Add more fields as needed
-
-                            var udemyCourse = new Course
-                            {
-                                Title = courseTitle,
-                                Link = courseLink,
-                                // Add more fields
-                            };
-
-                            udemyResults.Add(udemyCourse);
-                        }
-                    }
-                }
-                catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.Forbidden)
-                {
-                    // Handle 403 Forbidden error
-                    return udemyResults; // or handle it accordingly
-                }
-            }
-
-            return udemyResults;
-        }
+        
     }
 
 }

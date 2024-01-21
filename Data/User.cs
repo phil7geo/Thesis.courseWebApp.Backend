@@ -19,5 +19,8 @@ namespace Thesis.courseWebApp.Backend.Data
 
         [JsonIgnore]
         public UserSession Session { get; set; }
+
+        [JsonIgnore]
+        public UserSearch Search { get; set; }
     }
 }

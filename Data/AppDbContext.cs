@@ -15,6 +15,7 @@ namespace Thesis.courseWebApp.Backend.Data
         public DbSet<User> Users { get; set; }
         public DbSet<UserSession> UserSessions { get; set; }
         public DbSet<Message> Messages { get; set; }
+        public DbSet<UserSearch> UserSearches { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -27,6 +28,11 @@ namespace Thesis.courseWebApp.Backend.Data
                 .HasForeignKey<UserSession>(us => us.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<Message>().HasKey(e => e.Id);
+            modelBuilder.Entity<UserSearch>()
+                .HasOne(us => us.User)
+                .WithOne(u => u.Search)
+                .HasForeignKey<UserSearch>(us => us.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             // Add other configurations
             base.OnModelCreating(modelBuilder);

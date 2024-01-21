@@ -2,9 +2,8 @@ namespace Thesis.courseWebApp.Backend.Models
 {
     public class SearchCriteria
     {
-        // Properties for search criteria
         public string Level { get; set; }
-        public string[] Subjects { get; set; }
+        public string[] Subject { get; set; }
         public string Duration { get; set; }
         public bool OnSale { get; set; }
         public float Rating { get; set; }
@@ -13,7 +12,6 @@ namespace Thesis.courseWebApp.Backend.Models
         public string[] Language { get; set; }
         public string CourseFormat { get; set; }
         public string Location { get; set; }
-
-        // Add other properties as needed
+        public string Town { get; set; }
     }
 }
