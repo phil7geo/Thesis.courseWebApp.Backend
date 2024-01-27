@@ -29,46 +29,61 @@ namespace Thesis.courseWebApp.Backend.Controllers
         {
             try
             {
-                // Query the Courses table based on the specified filters
-                var resultsFromDatabase = _dbContext.Courses
+
+                if (criteria == null)
+                {
+                    return BadRequest(new { Message = "Bad Request", Error = "Invalid search criteria" });
+                }
+
+                var resultsFromDatabase = await _dbContext.Courses
                     .Where(c =>
                         (string.IsNullOrEmpty(criteria.Level) || c.Level == criteria.Level) &&
                         (criteria.Subject == null || criteria.Subject.All(s => c.Subject.Contains(s))) &&
                         (string.IsNullOrEmpty(criteria.Duration) || c.Duration == criteria.Duration) &&
                         (!criteria.OnSale || c.OnSale) &&
-                        (criteria.Rating <= 0 || c.Rating >= criteria.Rating) &&
-                        ((criteria.PriceRange == null || criteria.PriceRange.Length != 2) ||
-                            (c.Price >= (decimal)criteria.PriceRange[0] && c.Price <= (decimal)criteria.PriceRange[1])) &&
+                        (!criteria.Rating.HasValue || c.Rating >= criteria.Rating) &&
+                              ((criteria.PriceRange == null || criteria.PriceRange.Length != 2) ||
+                            (criteria.PriceRange[0] == null && criteria.PriceRange[1] == null) ||
+                            (criteria.PriceRange[0] == null || c.Price >= (double)criteria.PriceRange[0]) &&
+                            (criteria.PriceRange[1] == null || c.Price <= (double)criteria.PriceRange[1])) &&
                         (!criteria.Certification || c.Certification) &&
                         (criteria.Language == null || criteria.Language.Length == 0 || criteria.Language.Contains(c.Language)) &&
                         (string.IsNullOrEmpty(criteria.CourseFormat) || c.CourseFormat == criteria.CourseFormat) &&
                         (string.IsNullOrEmpty(criteria.Location) || c.Location == criteria.Location) &&
                         (string.IsNullOrEmpty(criteria.Town) || c.Town == criteria.Town)
                     )
-                    .ToList();
+                    .ToListAsync();
 
-                Console.WriteLine($"Criteria: {JsonConvert.SerializeObject(criteria)}");
-                Console.WriteLine($"Subject: {criteria.Subject}");
-                Console.WriteLine($"Duration: {criteria.Duration}");
-                Console.WriteLine($"OnSale: {criteria.OnSale}");
-                Console.WriteLine($"Certification: {criteria.Certification}");
-                Console.WriteLine($"Rating: {criteria.Rating}");
-                Console.WriteLine($"Language: {criteria.Language}");
+                Console.WriteLine($"Search Criteria in payload: {JsonConvert.SerializeObject(criteria)}");
+                Console.WriteLine($"Results from the Database (Courses table): {JsonConvert.SerializeObject(resultsFromDatabase)}");
 
-                Console.WriteLine($"Generated SQL Query: {_dbContext.Courses.ToQueryString()}");
-                Console.WriteLine($"Results from Courses Db table: {JsonConvert.SerializeObject(resultsFromDatabase)}");
+                if (resultsFromDatabase.Any())
+                {
+                    return Ok(new { Message = "Success", ActualMatchedResults = resultsFromDatabase });
+                }
 
-                return Ok(new { Message = "Success", Results = resultsFromDatabase });
+                resultsFromDatabase = await _dbContext.Courses
+                    .Where(c =>
+                        (criteria.Subject == null || criteria.Subject.Any(s => c.Subject.Contains(s))) &&
+                        (string.IsNullOrEmpty(criteria.Level) || c.Level == criteria.Level) &&
+                        (string.IsNullOrEmpty(criteria.Duration) || c.Duration == criteria.Duration)
+                    )
+                    .ToListAsync();
+
+                if (resultsFromDatabase.Any())
+                {
+                    return Ok(new { Message = "Success", SimilarMatchedResults = resultsFromDatabase });
+                }
+
+                return StatusCode(500, new { Message = "Internal Server Error", Error = "No results with the provided search filters" });
             }
             catch (Exception ex)
             {
-                // Log detailed error message
                 Console.WriteLine($"Error during database query: {ex.Message}");
-
-                // Handle exceptions and return an appropriate error response
                 return StatusCode(500, new { Message = "Internal Server Error", Error = ex.Message });
             }
         }
+
 
         [HttpPost("predictions")]
         public async Task<IActionResult> Predictions([FromBody] PredictInput input)

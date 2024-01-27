@@ -25,24 +25,24 @@ namespace Thesis.courseWebApp.Backend.Data
         public bool OnSale { get; set; }
 
         [Column("Rating")]
-        public float Rating { get; set; }
+        public float? Rating { get; set; }
 
         [Column("Price")]
-        public decimal Price { get; set; }
+        public double Price { get; set; }
 
         [Column("Certification")]
         public bool Certification { get; set; }
 
         [Column("Language")]
-        public string Language { get; set; }
+        public string? Language { get; set; }
 
         [Column("Course_format")]
-        public string CourseFormat { get; set; }
+        public string? CourseFormat { get; set; }
 
         [Column("Location")]
-        public string Location { get; set; }
+        public string? Location { get; set; }
 
         [Column("Town")]
-        public string Town { get; set; }
+        public string? Town { get; set; }
     }
 }
