@@ -20,12 +20,12 @@ namespace Thesis.courseWebApp.Backend.Models
             return cleanedInput;
         }
 
-        public async Task<List<string>> Predict(string preprocessedInput)
+        public async Task<List<string>> Predict(string username)
         {
             try
             {
                 // Implement logic to interact with your RNN model for predictions
-                var predictions = await _rnnModel.GetPredictions(preprocessedInput);
+                var predictions = await _rnnModel.GetPredictions(username);
                 return predictions;
             }
             catch (Exception ex)

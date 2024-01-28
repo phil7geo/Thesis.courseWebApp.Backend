@@ -86,12 +86,19 @@ namespace Thesis.courseWebApp.Backend.Controllers
 
 
         [HttpPost("predictions")]
-        public async Task<IActionResult> Predictions([FromBody] PredictInput input)
+        public async Task<IActionResult> Predictions([FromBody] PredictionsRequest request)
         {
             try
             {
+                var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Username == request.Username);
+                Console.WriteLine($"User-username: {user}");
+                if (user == null)
+                {
+                    return NotFound(new { Message = "User not found", Username = user });
+                }
+
                 // Implement logic to process user input and get predictions from RNN model
-                var predictions = await GetPredictionsFromRNN(input.UserInput);
+                var predictions = await GetPredictionsFromRNN(request.UserInput, user.Username);
 
                 return Ok(new { Predictions = predictions });
             }
@@ -103,12 +110,12 @@ namespace Thesis.courseWebApp.Backend.Controllers
         }
 
 
-        private async Task<List<string>> GetPredictionsFromRNN(string userInput)
+        private async Task<List<string>> GetPredictionsFromRNN(string userInput,string username)
         {
             try
             {
                 var preprocessedInput = _rnnModelService.PreprocessUserInput(userInput);
-                var predictions = await _rnnModelService.Predict(preprocessedInput);
+                var predictions = await _rnnModelService.Predict(username);
                 var predictedData = _rnnModelService.ProcessPredictions(predictions);
 
                 return predictedData;
@@ -120,7 +127,7 @@ namespace Thesis.courseWebApp.Backend.Controllers
             }
         }
 
-        
+
     }
 
 }

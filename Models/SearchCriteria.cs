@@ -1,5 +1,3 @@
-#nullable enable
-
 namespace Thesis.courseWebApp.Backend.Models
 {
     public class SearchCriteria

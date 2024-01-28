@@ -113,6 +113,13 @@ namespace Thesis.courseWebApp.Backend.Controllers
                 return BadRequest(new { Message = "Invalid username or password. Please use valid credentials" });
             }
 
+            if (user.FavouriteCourses == null)
+            {
+                user.FavouriteCourses = string.Empty; // Initialize as an empty string
+            }
+
+            var favoriteCoursesList = user.FavouriteCourses?.Split(',').ToList() ?? new List<string>();
+
             var sessionId = await GenerateAndStoreSession(user.Id);
 
             // Generate and set HttpContext.User with the user claims

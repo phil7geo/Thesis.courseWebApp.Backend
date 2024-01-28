@@ -17,6 +17,12 @@ namespace Thesis.courseWebApp.Backend.Data
         [Column("Hashed_password")]
         public string Password { get; set; }
 
+        //[Column("Favourite_courses")]
+        //public List<string> FavouriteCourses { get; set; }
+
+        [Column("Favourite_courses")]
+        public string ?FavouriteCourses { get; set; }
+
         [JsonIgnore]
         public UserSession Session { get; set; }
 

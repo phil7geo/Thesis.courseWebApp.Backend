@@ -110,3 +110,5 @@ C:\Users\fgeorgantzos\source\repos\phil7geo\Thesis.courseWebApp.Backend\obj\Debu
 C:\Users\fgeorgantzos\source\repos\phil7geo\Thesis.courseWebApp.Backend\obj\Debug\net8.0\Thesis.courseWebApp.Backend.genruntimeconfig.cache
 C:\Users\fgeorgantzos\source\repos\phil7geo\Thesis.courseWebApp.Backend\obj\Debug\net8.0\ref\Thesis.courseWebApp.Backend.dll
 C:\Users\fgeorgantzos\source\repos\phil7geo\Thesis.courseWebApp.Backend\bin\Debug\net8.0\Newtonsoft.Json.dll
+C:\Users\fgeorgantzos\source\repos\phil7geo\Thesis.courseWebApp.Backend\bin\Debug\net8.0\package-lock.json
+C:\Users\fgeorgantzos\source\repos\phil7geo\Thesis.courseWebApp.Backend\bin\Debug\net8.0\package.json
