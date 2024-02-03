@@ -34,7 +34,7 @@ namespace Thesis.courseWebApp.Backend.Models
                 }
             }
 
-            // If the user doesn't exist or has no favorite courses, return some default values
+            // If the user doesn't exist or has no favorite courses, return appropriate message
             return new List<string> { "No favorite courses found." };
         }
 

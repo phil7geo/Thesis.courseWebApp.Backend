@@ -8,6 +8,7 @@ using Thesis.courseWebApp.Backend.Data;
 using Thesis.courseWebApp.Backend.Models;
 using System.Net;
 using Newtonsoft.Json;
+using Thesis.courseWebApp.Backend.Controllers;
 
 namespace Thesis.courseWebApp.Backend.Controllers
 {
@@ -18,12 +19,14 @@ namespace Thesis.courseWebApp.Backend.Controllers
         private readonly AppDbContext _dbContext;
         private readonly RnnModelService _rnnModelService;
         private readonly DbSet<UserSearch> _userSearches;
+        private readonly AuthController _authController;
 
-        public SearchController(AppDbContext dbContext, RnnModelService rnnModelService)
+        public SearchController(AppDbContext dbContext, RnnModelService rnnModelService, AuthController authController)
         {
             _dbContext = dbContext;
             _rnnModelService = rnnModelService;
             _userSearches = dbContext.Set<UserSearch>();
+            _authController = authController;
         }
 
         [HttpPost("search")]
@@ -72,23 +75,31 @@ namespace Thesis.courseWebApp.Backend.Controllers
                     )
                     .ToListAsync();
 
+                var token = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+                var userId = _authController.GetUserIdFromToken(token);
+
                 try
                 {
-                    // Save the Course User Search in the respective DB table         
-                    var userId = int.Parse(User.FindFirst("sub").Value);
+                    var criteriaJson = JsonConvert.SerializeObject(criteria);
+                    var searchQuery = JsonConvert.DeserializeObject<Dictionary<string, object>>(criteriaJson);
 
-                    Console.WriteLine($"UserId for UserSearch: {userId}");
+                    // Extract keys with non-null values
+                    var filterKeys = searchQuery
+                        .Where(kv => kv.Value != null)
+                        .Select(kv => kv.Key)
+                        .ToList();
+
+                    // Create the Filters string
+                    var filters = string.Join(",", filterKeys);
+
+                    // Save the Course User Search in the respective DB table         
                     var userSearch = new UserSearch
                     {
                         UserId = userId,
                         SearchQuery = JsonConvert.SerializeObject(criteria),
-                        Filters = "Customize based on your criteria",
+                        Filters = filters,
                         Timestamp = DateTime.UtcNow
                     };
-
-                    Console.WriteLine($"Last User Search: {userSearch}");
-
-                    Console.WriteLine("\n\n\n\n\n\n\\n");
 
                     if (userSearch != null)
                     {

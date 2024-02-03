@@ -13,6 +13,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Thesis.courseWebApp.Backend.Controllers;
 
 public class Program
 {
@@ -61,6 +62,8 @@ public class Program
                           IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:SecretKey"]))
                       };
                   });
+
+                 services.AddScoped<AuthController>();
 
                  // Register RnnModel
                  services.AddScoped<RnnModel>();

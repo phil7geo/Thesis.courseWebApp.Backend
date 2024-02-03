@@ -2,10 +2,8 @@
   "ExpandedNodes": [
     "",
     "\\Controllers",
-    "\\Data",
-    "\\Migrations",
-    "\\Models"
+    "\\Data"
   ],
-  "SelectedNode": "\\Models\\PredictionsRequest.cs",
+  "SelectedNode": "\\Data\\UserSession.cs",
   "PreviewInSolutionExplorer": false
 }

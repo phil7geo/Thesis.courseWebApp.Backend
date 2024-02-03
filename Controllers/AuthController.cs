@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
-//using System.IdentityModel.Tokens.Jwt;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -423,9 +422,9 @@ namespace Thesis.courseWebApp.Backend.Controllers
             return BCrypt.Net.BCrypt.Verify(enteredPassword, hashedPassword);
         }
 
-        private int GetUserIdFromToken(string token)
+       
+        public int GetUserIdFromToken(string token)
         {
-            // Extract the user ID from the JWT token
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.UTF8.GetBytes(_configuration["Jwt:SecretKey"]);
 
@@ -443,13 +442,14 @@ namespace Thesis.courseWebApp.Backend.Controllers
             SecurityToken validatedToken;
             var principal = tokenHandler.ValidateToken(token, validationParameters, out validatedToken);
 
-            var userIdClaim = principal.FindFirst(ClaimTypes.NameIdentifier);
-            if (userIdClaim != null && int.TryParse(userIdClaim.Value, out int userId))
+            var usernameClaim = principal.FindFirst("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name");
+            if (usernameClaim != null)
             {
+                // Perform a lookup in your database based on the username to get the user ID
+                var userId = GetUserIdByUsername(usernameClaim.Value);
                 return userId;
             }
 
-            // Return a default value or throw an exception based on your requirements
             return 0;
         }
 
@@ -458,6 +458,17 @@ namespace Thesis.courseWebApp.Backend.Controllers
             var tokenHandler = new JwtSecurityTokenHandler();
             var isValid = tokenHandler.CanReadToken(token);
             return isValid;
+        }
+
+        public int GetUserIdByUsername(string username)
+        {
+            // Query the database to get the user ID based on the username
+            var userId = _dbContext.Users
+                .Where(u => u.Username == username)
+                .Select(u => u.Id)
+                .FirstOrDefault();
+
+            return userId;
         }
 
 
