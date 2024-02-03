@@ -17,11 +17,13 @@ namespace Thesis.courseWebApp.Backend.Controllers
     {
         private readonly AppDbContext _dbContext;
         private readonly RnnModelService _rnnModelService;
+        private readonly DbSet<UserSearch> _userSearches;
 
         public SearchController(AppDbContext dbContext, RnnModelService rnnModelService)
         {
             _dbContext = dbContext;
             _rnnModelService = rnnModelService;
+            _userSearches = dbContext.Set<UserSearch>();
         }
 
         [HttpPost("search")]
@@ -70,6 +72,38 @@ namespace Thesis.courseWebApp.Backend.Controllers
                     )
                     .ToListAsync();
 
+                try
+                {
+                    // Save the Course User Search in the respective DB table         
+                    var userId = int.Parse(User.FindFirst("sub").Value);
+
+                    Console.WriteLine($"UserId for UserSearch: {userId}");
+                    var userSearch = new UserSearch
+                    {
+                        UserId = userId,
+                        SearchQuery = JsonConvert.SerializeObject(criteria),
+                        Filters = "Customize based on your criteria",
+                        Timestamp = DateTime.UtcNow
+                    };
+
+                    Console.WriteLine($"Last User Search: {userSearch}");
+
+                    Console.WriteLine("\n\n\n\n\n\n\\n");
+
+                    if (userSearch != null)
+                    {
+                        _dbContext.UserSearches.Add(userSearch);
+                        int savedChanges = await _dbContext.SaveChangesAsync();
+                        Console.WriteLine($"Number of changes saved: {savedChanges}");
+                    }
+
+                }
+                catch (DbUpdateException ex)
+                {
+                    // Handle database update exception
+                    Console.WriteLine($"Error updating the database: {ex.Message}");
+                }
+
                 if (resultsFromDatabase.Any())
                 {
                     return Ok(new { Message = "Success", SimilarMatchedResults = resultsFromDatabase });
@@ -82,6 +116,7 @@ namespace Thesis.courseWebApp.Backend.Controllers
                 Console.WriteLine($"Error during database query: {ex.Message}");
                 return StatusCode(500, new { Message = "Internal Server Error", Error = ex.Message });
             }
+
         }
 
 
