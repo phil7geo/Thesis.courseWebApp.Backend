@@ -213,10 +213,19 @@ namespace Thesis.courseWebApp.Backend.Controllers
                 var usernameClaim = principal.FindFirst(ClaimTypes.Name);
                 var username = usernameClaim?.Value;
 
+                // Fetch additional user information from the database
+                var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Username == username);
+
                 // Log additional information
                 Console.WriteLine($"Token validated successfully for user: {username}");
 
-                return Ok(new { IsLoggedIn = true, Username = username });
+                return Ok(new
+                {
+                    IsLoggedIn = true,
+                    Username = username,
+                    Email = user?.Email,
+                    FavouriteCourses = user?.FavouriteCourses
+                });
             }
             catch (Exception ex)
             {
@@ -225,6 +234,7 @@ namespace Thesis.courseWebApp.Backend.Controllers
                 return Ok(new { IsLoggedIn = false, Message = "Token validation failed" });
             }
         }
+
 
         [HttpPost("logout")]
         public async Task<IActionResult> Logout()
