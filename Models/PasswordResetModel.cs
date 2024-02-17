@@ -6,6 +6,5 @@ namespace Thesis.courseWebApp.Backend.Models
         public string Email { get; set; }
         public string OldPassword { get; set; }
         public string NewPassword { get; set; }
-        // Add other properties as needed
     }
 }

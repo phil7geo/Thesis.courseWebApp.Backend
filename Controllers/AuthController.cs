@@ -25,14 +25,11 @@ namespace Thesis.courseWebApp.Backend.Controllers
         private readonly IConfiguration _configuration;
         private readonly ILogger<AuthController> _logger;
 
-        //private readonly EmailService _emailService;
-
         public AuthController(IConfiguration configuration, AppDbContext dbContext, ILogger<AuthController> logger)
         {
             _configuration = configuration;
             _dbContext = dbContext;
             _logger = logger;
-            //_emailService = emailService;
         }
 
         [HttpPost("register")]
@@ -114,7 +111,7 @@ namespace Thesis.courseWebApp.Backend.Controllers
 
             if (user.FavouriteCourses == null)
             {
-                user.FavouriteCourses = string.Empty; // Initialize as an empty string
+                user.FavouriteCourses = string.Empty; 
             }
 
             var favoriteCoursesList = user.FavouriteCourses?.Split(',').ToList() ?? new List<string>();
@@ -235,7 +232,6 @@ namespace Thesis.courseWebApp.Backend.Controllers
             }
         }
 
-
         [HttpPost("logout")]
         public async Task<IActionResult> Logout()
         {
@@ -261,9 +257,6 @@ namespace Thesis.courseWebApp.Backend.Controllers
                     _dbContext.UserSessions.Remove(userSession);
                     await _dbContext.SaveChangesAsync();
                 }
-
-                // Invalidate the JWT token (optional, depending on your requirements)
-                // You can add token revocation logic or simply ignore the token on the client side
 
                 return Ok(new { Success = true, Message = "Logout successful" });
             }
@@ -386,7 +379,6 @@ namespace Thesis.courseWebApp.Backend.Controllers
 
         private bool IsValidPasswordReset(PasswordResetModel model)
         {
-            // Check if the old and new passwords meet certain criteria
 
             // Check if the old password is provided
             if (string.IsNullOrWhiteSpace(model.OldPassword))
@@ -412,15 +404,12 @@ namespace Thesis.courseWebApp.Backend.Controllers
 
         private string GenerateResetToken()
         {
-            // enerate a unique reset token or link
             // use a GUID
             return Guid.NewGuid().ToString();
         }
 
         private string HashPassword(string password)
         {
-            // logic to hash the password
-            // use a secure hashing algorithm like bcrypt
             // Hash the password using bcrypt
             string hashedPassword = BCrypt.Net.BCrypt.HashPassword(password);
 
@@ -472,7 +461,7 @@ namespace Thesis.courseWebApp.Backend.Controllers
 
         public int GetUserIdByUsername(string username)
         {
-            // Query the database to get the user ID based on the username
+            // Query to the database to get the user ID based on the username
             var userId = _dbContext.Users
                 .Where(u => u.Username == username)
                 .Select(u => u.Id)

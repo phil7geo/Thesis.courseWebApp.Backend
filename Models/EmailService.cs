@@ -8,6 +8,7 @@ public class EmailService
     private readonly string _smtpUsername;
     private readonly string _smtpPassword;
 
+    // ToDo : Use the email service in the AuthController(password-reset) and ContactController to send an email with reset-link / response.
     public EmailService(string smtpServer, int smtpPort, string smtpUsername, string smtpPassword)
     {
         _smtpServer = smtpServer;
@@ -42,13 +43,12 @@ public class EmailService
         catch (Exception ex)
         {
             Console.WriteLine($"Error sending reset email: {ex.Message}");
-            // You might want to log the exception or handle it in a way that makes sense for your application
         }
     }
 
     private string GenerateResetLink(string resetToken)
     {
-        // placeholder reset-password link
+        // reset-password link
         return $"http://http://localhost:3000/reset-password?token={resetToken}";
     }
 }

@@ -5,8 +5,6 @@ namespace Thesis.courseWebApp.Backend.Models
 {
     public class ContactMessageModel
     {
-        //[Required(ErrorMessage = "FullName is required")]
-        //[FullName(ErrorMessage = "Invalid full name")]
 
         [Required(ErrorMessage = "FullName is required")]
         public string FullName { get; set; }

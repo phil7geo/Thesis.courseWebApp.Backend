@@ -10,14 +10,10 @@ namespace Thesis.courseWebApp.Backend.Controllers
     [Route("api")]
     public class ContactController : ControllerBase
     {
-        //private readonly ContactMessageRepository _messageRepository;
-        //private readonly EmailService _emailService;
         private readonly AppDbContext _dbContext;
 
         public ContactController(AppDbContext dbContext)
         {
-            //_messageRepository = messageRepository;
-            //_emailService = emailService;
             _dbContext = dbContext;
         }
 
@@ -49,12 +45,10 @@ namespace Thesis.courseWebApp.Backend.Controllers
 
                 var messageContent = message.MessageContent;
 
-                // For simplicity, let's assume the message is sent successfully
                 return Ok(new { Success = true, Message = "Message sent successfully", MessageSent = messageContent });
             }
             catch (Exception ex)
             {
-                // Handle exceptions appropriately, log them, and return a meaningful error response
                 return StatusCode(500, new { Message = "Internal Server Error", Error = ex.Message });
             }
         }

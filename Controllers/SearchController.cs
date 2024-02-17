@@ -89,7 +89,7 @@ namespace Thesis.courseWebApp.Backend.Controllers
                         .Select(kv => kv.Key)
                         .ToList();
 
-                    // Create the Filters string
+                    // Construct the Filters string
                     var filters = string.Join(",", filterKeys);
 
                     // Save the Course User Search in the respective DB table         
